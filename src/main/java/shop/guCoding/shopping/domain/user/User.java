@@ -55,5 +55,17 @@ public class User {
     @Column(nullable = false)
     private LocalDateTime updatedAt;
 
-
+    @Builder
+    public User(Long id, String username, String password, String email, String fullname, UserEnum role, List<Account> accountList, List<Order> orderList, LocalDateTime createdAt, LocalDateTime updatedAt) {
+        this.id = id;
+        this.username = username;
+        this.password = password;
+        this.email = email;
+        this.fullname = fullname;
+        this.role = role;
+        this.accountList = accountList;
+        this.orderList = orderList;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+    }
 }
