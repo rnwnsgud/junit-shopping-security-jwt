@@ -44,7 +44,7 @@ class UserServiceTest extends DummyObject {
         joinReqDto.setFullname("쌀");
 
         //stub
-        when(userRepository.findByEmail()).thenReturn(Optional.empty());
+        when(userRepository.findByEmail(joinReqDto.getEmail())).thenReturn(Optional.empty());
 
         User ssar = newMockUser(1L, "ssar", "쌀");
         when(userRepository.save(any())).thenReturn(ssar);

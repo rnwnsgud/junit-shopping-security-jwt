@@ -26,7 +26,7 @@ public class UserService {
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     public JoinRespDto 회원가입(JoinReqDto joinReqDto) {
-        Optional<User> userOP = userRepository.findByEmail();
+        Optional<User> userOP = userRepository.findByEmail(joinReqDto.getEmail());
         if (userOP.isPresent()) {
             throw new CustomApiException("동일한 이메일이 존재합니다.");
         }
