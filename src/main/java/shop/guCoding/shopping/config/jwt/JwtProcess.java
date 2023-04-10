@@ -12,27 +12,24 @@ import shop.guCoding.shopping.domain.user.UserEnum;
 
 import java.util.Date;
 
+import static shop.guCoding.shopping.config.jwt.JwtVO.*;
+
 
 public class JwtProcess {
     private final Logger log = LoggerFactory.getLogger(getClass());
 
-    @Value("${jwt.expiration_time:null}")
-    private static Integer EXPIRATION_TIME;
-
-    @Value("${jwt.secret:null}")
-    private static String SECRET;
-
-    @Value("${jwt.token_prefix:null}")
-    private static String TOKEN_PREFIX;
-
     // access 토큰 생성
     public static String accessTokenCreate(LoginUser loginUser) {
+//        System.out.println("테스트 : loginUser " + loginUser.getUser().getId());
+//        System.out.println("테스트 : date" + System.currentTimeMillis());
+//        System.out.println("테스트 : expirationTime" + EXPIRATION_TIME);
         String jwtToken = JWT.create()
                 .withSubject("shopping")
-                .withExpiresAt(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
+                .withExpiresAt(new Date(System.currentTimeMillis() + 100))
                 .withClaim("id", loginUser.getUser().getId())
                 .withClaim("role", loginUser.getUser().getRole().name())
                 .sign(Algorithm.HMAC512(SECRET));
+//        System.out.println("테스트 : jwtToken" + jwtToken);
 
         return TOKEN_PREFIX + jwtToken;
     }
@@ -42,8 +39,6 @@ public class JwtProcess {
         String jwtToken = JWT.create()
                 .withSubject("shopping")
                 .withExpiresAt(new Date(System.currentTimeMillis() + EXPIRATION_TIME * 4))
-                .withClaim("id", loginUser.getUser().getId())
-                .withClaim("role", loginUser.getUser().getRole().name())
                 .sign(Algorithm.HMAC512(SECRET));
 
         return TOKEN_PREFIX + jwtToken;
