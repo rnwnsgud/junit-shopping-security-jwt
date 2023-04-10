@@ -29,3 +29,9 @@ logging:
   level:
     '[shop.guCoding.shopping]' : DEBUG
     '[org.hibernate.type]' : TRACE
+
+jwt:
+  secret : "구코딩" # 서버만 알고있는 시크릿 키
+  expiration_time : 10080000 # 1000 * 60 * 24 * 7 1주일 시간
+  token_prefix : "Bearer "
+  header : "Authorization"
