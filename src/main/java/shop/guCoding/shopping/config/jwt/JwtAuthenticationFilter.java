@@ -14,6 +14,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import shop.guCoding.shopping.config.auth.LoginUser;
 import shop.guCoding.shopping.dto.user.UserReqDto;
 import shop.guCoding.shopping.dto.user.UserRespDto;
+import shop.guCoding.shopping.service.JwtService;
 import shop.guCoding.shopping.util.CustomResponseUtil;
 
 import javax.servlet.FilterChain;
@@ -33,12 +34,14 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
     private final Logger log = LoggerFactory.getLogger(getClass());
 
-    private AuthenticationManager authenticationManager;
+    private final AuthenticationManager authenticationManager;
+    private final JwtService jwtService;
 
-    public JwtAuthenticationFilter(AuthenticationManager authenticationManager) {
+    public JwtAuthenticationFilter(AuthenticationManager authenticationManager, JwtService jwtService) {
         super(authenticationManager);
         setFilterProcessesUrl("/api/login");
         this.authenticationManager = authenticationManager;
+        this.jwtService = jwtService;
     }
 
     // Post : /login
@@ -64,19 +67,18 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
         log.debug("디버그 : successfulAuthentication 호출됨");
+
         LoginUser loginUser = (LoginUser) authResult.getPrincipal();
-        log.debug("loginUser id", loginUser.getUser().getId());
-        String jwtAccessToken = JwtProcess.accessTokenCreate(loginUser);
-        log.debug("jwtAccessToken", jwtAccessToken);
-        String jwtRefreshToken = JwtProcess.refreshTokenCreate(loginUser);
+
+        String jwtAccessToken = jwtService.accessTokenCreate(loginUser);
+        String jwtRefreshToken = jwtService.refreshTokenCreate();
+
         response.addHeader(ACCESS_HEADER, jwtAccessToken);
         response.addHeader(REFRESH_HEADER, jwtRefreshToken);
 
+        jwtService.saveRefreshToken(loginUser,jwtRefreshToken);
+
         LoginRespDto loginRespDto = new LoginRespDto(loginUser.getUser());
-        log.debug("디버그 : loginRespDto", loginRespDto.getEmail());
-        log.debug("디버그 : loginRespDto", loginRespDto.getId());
-        log.debug("디버그 : loginRespDto", loginRespDto.getUsername());
-        log.debug("디버그 : loginRespDto", loginRespDto.getCreatedAt());
         CustomResponseUtil.success(response, loginRespDto);
     }
 

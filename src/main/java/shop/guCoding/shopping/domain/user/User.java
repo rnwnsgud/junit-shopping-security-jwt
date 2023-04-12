@@ -37,6 +37,9 @@ public class User {
     @Column(nullable = false, length = 20)
     private String fullname;
 
+    @Column(nullable = false, length = 250)
+    private String refreshToken;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private UserEnum role;
@@ -54,6 +57,10 @@ public class User {
     @LastModifiedDate
     @Column(nullable = false)
     private LocalDateTime updatedAt;
+
+    public void saveRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
+    }
 
     @Builder
     public User(Long id, String username, String password, String email, String fullname, UserEnum role, List<Account> accountList, List<Order> orderList, LocalDateTime createdAt, LocalDateTime updatedAt) {

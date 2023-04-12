@@ -1,5 +1,6 @@
 package shop.guCoding.shopping.config;
 
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
@@ -16,12 +17,16 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import shop.guCoding.shopping.config.jwt.JwtAuthenticationFilter;
 import shop.guCoding.shopping.domain.user.UserEnum;
+import shop.guCoding.shopping.service.JwtService;
 import shop.guCoding.shopping.util.CustomResponseUtil;
 
+@RequiredArgsConstructor
 @Configuration
 public class SecurityConfig {
 
     private final Logger log = LoggerFactory.getLogger(getClass());
+
+    private final JwtService jwtService;
 
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
@@ -71,7 +76,7 @@ public class SecurityConfig {
         @Override
         public void configure(HttpSecurity builder) throws Exception {
             AuthenticationManager authenticationManager = builder.getSharedObject(AuthenticationManager.class);
-            builder.addFilter(new JwtAuthenticationFilter(authenticationManager));
+            builder.addFilter(new JwtAuthenticationFilter(authenticationManager, jwtService));
             super.configure(builder);
         }
     }
