@@ -16,6 +16,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import shop.guCoding.shopping.config.jwt.JwtAuthenticationFilter;
+import shop.guCoding.shopping.config.jwt.JwtAuthorizationFilter;
 import shop.guCoding.shopping.domain.user.UserEnum;
 import shop.guCoding.shopping.service.JwtService;
 import shop.guCoding.shopping.util.CustomResponseUtil;
@@ -77,6 +78,7 @@ public class SecurityConfig {
         public void configure(HttpSecurity builder) throws Exception {
             AuthenticationManager authenticationManager = builder.getSharedObject(AuthenticationManager.class);
             builder.addFilter(new JwtAuthenticationFilter(authenticationManager, jwtService));
+//            builder.addFilter(new JwtAuthorizationFilter(authenticationManager, jwtService));
             super.configure(builder);
         }
     }

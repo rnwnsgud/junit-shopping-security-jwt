@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import shop.guCoding.shopping.dto.ResponseDto;
 import shop.guCoding.shopping.handler.ex.CustomApiException;
+import shop.guCoding.shopping.handler.ex.CustomJwtException;
 import shop.guCoding.shopping.handler.ex.CustomValidationException;
 
 @RestControllerAdvice
@@ -24,5 +25,11 @@ public class CustomExceptionHandler {
     public ResponseEntity<?> validationException(CustomValidationException e) {
         log.error(e.getMessage());
         return new ResponseEntity<>(new ResponseDto<>(-1, e.getMessage(), e.getErrorMap()), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(CustomJwtException.class)
+    public ResponseEntity<?> jwtException(CustomJwtException e) {
+        log.error(e.getMessage());
+        return new ResponseEntity<>(new ResponseDto<>(-1, e.getMessage(), null), HttpStatus.BAD_REQUEST);
     }
 }

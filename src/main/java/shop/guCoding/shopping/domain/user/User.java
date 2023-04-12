@@ -37,7 +37,7 @@ public class User {
     @Column(nullable = false, length = 20)
     private String fullname;
 
-    @Column(nullable = false, length = 250)
+    @Column(length = 250)
     private String refreshToken;
 
     @Enumerated(EnumType.STRING)
