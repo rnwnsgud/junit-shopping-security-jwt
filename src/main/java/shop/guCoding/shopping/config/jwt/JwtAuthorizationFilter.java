@@ -25,10 +25,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 
 //    @Value("${jwt.access_header:null}")
 //    private String ACCESS_HEADER;
-//    @Value("${jwt.access_header:null}")
-//    private String REFRESH_HEADER;
-//    @Value("${jwt.token_prefix:null}")
-//    private String TOKEN_PREFIX;
+
     private final JwtService jwtService;
 
     public JwtAuthorizationFilter(AuthenticationManager authenticationManager, JwtService jwtService) {
@@ -40,7 +37,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
         log.debug("디버그 : 인가필터 호출");
         // header 검증
-        // if로 안 묶으면 회원가입시 token 이 null 이라 오류뜸
+        // if로 안 묶으면 회원가입시 token 이 null 이라 오류뜸, 테스트마다 access(실제값), refresh 넣어줘야하네()
         if (jwtService.checkHeaderVerify(request)) {
             String accessToken = request.getHeader("ACCESS_TOKEN").replace("Bearer ",""); // Bearer 앞에 없앤 순수한 토큰
             String refreshToken = request.getHeader("REFRESH_TOKEN").replace("Bearer ","");
@@ -50,13 +47,16 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
                 LoginUser loginUser = jwtService.accessTokenVerify(accessToken);
                 Authentication authentication = new UsernamePasswordAuthenticationToken(loginUser,null,loginUser.getAuthorities());
                 SecurityContextHolder.getContext().setAuthentication(authentication);
+
+//                log.debug("securityContext" + SecurityContextHolder.getContext().getAuthentication().getPrincipal());
             } catch (TokenExpiredException e) {
-                log.error("accessToken 오류"); // **이게 만료됐으면 다시 만들어주면 되는데, 조작돼서 오류난거면 어뜨케 해줘야 됨**
+                log.error("accessToken 오류");
                 // refreshToken 검증
                 try {
                     jwtService.refreshTokenVerify(refreshToken);
                     LoginUser loginUser = jwtService.findUserWithRefreshToken(refreshToken);
-                    jwtService.accessTokenCreate(loginUser);
+                    String reissuedAccessToken = jwtService.accessTokenCreate(loginUser);
+                    response.addHeader("ACCESS_TOKEN", reissuedAccessToken);
                 } catch (TokenExpiredException exception) {
                     throw new CustomJwtException(exception.getMessage());
                 }

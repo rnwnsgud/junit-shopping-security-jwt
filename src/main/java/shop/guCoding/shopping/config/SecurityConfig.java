@@ -47,9 +47,15 @@ public class SecurityConfig {
 
         http.apply(new CustomSecurityFilterManger()); // 필터적용
 
+        // 인증실패 예외 가로채기
         http.exceptionHandling().authenticationEntryPoint((request, response, authenticationException) -> {
             CustomResponseUtil.fail(response, "로그인을 해주세요", HttpStatus.UNAUTHORIZED);
         });
+
+        // 권한실패 예외 가로채기
+        http.exceptionHandling().accessDeniedHandler(((request, response, e) -> {
+            CustomResponseUtil.fail(response, "권한이 없습니다.", HttpStatus.FORBIDDEN);
+        }));
 
         http.authorizeRequests()
                 .antMatchers("/api/s/**").authenticated()
@@ -78,7 +84,7 @@ public class SecurityConfig {
         public void configure(HttpSecurity builder) throws Exception {
             AuthenticationManager authenticationManager = builder.getSharedObject(AuthenticationManager.class);
             builder.addFilter(new JwtAuthenticationFilter(authenticationManager, jwtService));
-//            builder.addFilter(new JwtAuthorizationFilter(authenticationManager, jwtService));
+            builder.addFilter(new JwtAuthorizationFilter(authenticationManager, jwtService));
             super.configure(builder);
         }
     }

@@ -33,14 +33,14 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
     private final Logger log = LoggerFactory.getLogger(getClass());
 
-//    @Value("${jwt.access_header:null}") // 테스트 코드에서는 잘 가져오더니 왜 null이 들어오는지 물어보기
+//    @Value("${jwt.access_header:null}")
 //    String access_header;
 //
 //    @Value("${jwt.refresh_header:null}")
 //    String refresh_header;
 //
 //    @Value("${jwt.token_prefix:null}")
-//    String token_prefix; // 얘가 null 들어왔네 ㅅㅂ
+//    String token_prefix; // 얘가 null 들어왔네 ㅅㅂ 왜 null인지 물어보기 question
 
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;

@@ -61,7 +61,7 @@ public class JwtService {
 
         String jwtToken = JWT.create()
                 .withSubject("shopping")
-                .withExpiresAt(new Date(System.currentTimeMillis() + 100))
+                .withExpiresAt(new Date(System.currentTimeMillis() + 1000 * 60 * 24 * 7 )) // 1주일 // 오류낼려고 잠시 수정
                 .withClaim("id", loginUser.getUser().getId())
                 .withClaim("role", loginUser.getUser().getRole().name())
                 .sign(Algorithm.HMAC512(SECRET));
@@ -73,7 +73,7 @@ public class JwtService {
     public String refreshTokenCreate() {
         String jwtToken = JWT.create()
                 .withSubject("shopping")
-                .withExpiresAt(new Date(System.currentTimeMillis() + EXPIRATION_TIME * 4)) // integer 도 잘되나 확인
+                .withExpiresAt(new Date(System.currentTimeMillis() + EXPIRATION_TIME * 4 )) // integer 도 잘되나 확인
                 .sign(Algorithm.HMAC512(SECRET));
 
         return TOKEN_PREFIX + jwtToken;
@@ -90,11 +90,9 @@ public class JwtService {
 
         if (accessHeader == null) {
             log.error("AccessToken 헤더가 없어요");
-//            throw new CustomJwtException("AccessToken 헤더가 없어요"); // 회원가입때도 동작해서 안움직임 로그만 찍자
         }
         if (refreshHeader == null) {
             log.error("RefreshToken 헤더가 없어요");
-//            throw new CustomJwtException("RefreshToken 헤더가 없어요");
         }
 
         return false;
@@ -102,10 +100,12 @@ public class JwtService {
 
     // accessToken 검증 및 세션생성
     public LoginUser accessTokenVerify(String token) {
+        log.debug("accessToken 검증할게요");
         DecodedJWT decodedJWT = JWT.require(Algorithm.HMAC512(SECRET)).build().verify(token);
 
         Long id = decodedJWT.getClaim("id").asLong();
         String role = decodedJWT.getClaim("role").asString();
+        log.debug("토큰의 유저의 role" + role);
         User user = User.builder().id(id).role(UserEnum.valueOf(role)).build();
         LoginUser loginUser = new LoginUser(user);
         return loginUser;

@@ -25,6 +25,9 @@ spring:
   output:
     ansi:
       enabled: always
+  mvc:
+    throw-exception-if-no-handler-found : true
+    dispatch-options-request : false
 logging:
   level:
     '[shop.guCoding.shopping]' : DEBUG
