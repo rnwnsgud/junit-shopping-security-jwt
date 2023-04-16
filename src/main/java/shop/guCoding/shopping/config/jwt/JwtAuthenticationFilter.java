@@ -11,6 +11,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.stereotype.Component;
 import shop.guCoding.shopping.config.auth.LoginUser;
 import shop.guCoding.shopping.dto.user.UserReqDto;
 import shop.guCoding.shopping.dto.user.UserRespDto;
@@ -28,19 +29,20 @@ import java.io.IOException;
 import static shop.guCoding.shopping.dto.user.UserReqDto.*;
 import static shop.guCoding.shopping.dto.user.UserRespDto.*;
 
+@Component
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
 
     private final Logger log = LoggerFactory.getLogger(getClass());
 
-//    @Value("${jwt.access_header:null}")
-//    String access_header;
-//
-//    @Value("${jwt.refresh_header:null}")
-//    String refresh_header;
-//
-//    @Value("${jwt.token_prefix:null}")
-//    String token_prefix; // 얘가 null 들어왔네 ㅅㅂ 왜 null인지 물어보기 question
+    @Value("${jwt.access_header:null}")
+    private String ACCESS_HEADER;
+
+    @Value("${jwt.refresh_header:null}")
+    private String REFRESH_HEADER;
+
+    @Value("${jwt.token_prefix:null}")
+    private String TOKEN_PREFIX;
 
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
@@ -82,15 +84,15 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
         String jwtAccessToken = jwtService.accessTokenCreate(loginUser);
         String jwtRefreshToken = jwtService.refreshTokenCreate();
+//
+//        log.debug("디버그 : jwtAccTK " + jwtAccessToken);
+//        log.debug("디버그 : jwtRefTK " + jwtRefreshToken);
 
-        log.debug("디버그 : jwtAccTK " + jwtAccessToken);
-        log.debug("디버그 : jwtRefTK " + jwtRefreshToken);
-
-        response.addHeader("ACCESS_TOKEN", jwtAccessToken);
-        response.addHeader("REFRESH_TOKEN", jwtRefreshToken);
+        response.addHeader(ACCESS_HEADER, jwtAccessToken);
+        response.addHeader(REFRESH_HEADER, jwtRefreshToken);
 
 //        log.debug("TOKEN_PREFIX " + token_prefix);
-        String refreshTokenNotBearer = jwtRefreshToken.replace("Bearer ",""); // 왜 null 이 되는거임?
+        String refreshTokenNotBearer = jwtRefreshToken.replace(TOKEN_PREFIX,"");
         log.debug("디버그 : refreshTokenNotBearer " + refreshTokenNotBearer);
 
         jwtService.saveRefreshToken(loginUser,refreshTokenNotBearer);

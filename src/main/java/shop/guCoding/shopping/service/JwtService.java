@@ -81,6 +81,7 @@ public class JwtService {
 
     // header 검증
     public boolean checkHeaderVerify(HttpServletRequest request) {
+        log.debug("디버그 : access token 헤더 있니?" + ACCESS_HEADER);
         String accessHeader = request.getHeader(ACCESS_HEADER);
         String refreshHeader = request.getHeader(REFRESH_HEADER);
 

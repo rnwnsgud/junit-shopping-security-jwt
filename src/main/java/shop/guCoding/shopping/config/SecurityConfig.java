@@ -26,14 +26,9 @@ import shop.guCoding.shopping.util.CustomResponseUtil;
 public class SecurityConfig {
 
     private final Logger log = LoggerFactory.getLogger(getClass());
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final JwtAuthorizationFilter jwtAuthorizationFilter;
 
-    private final JwtService jwtService;
-
-    @Bean
-    public BCryptPasswordEncoder passwordEncoder() {
-        log.debug("디버그 : BCryptPasswordEncoder 등록");
-        return new BCryptPasswordEncoder();
-    }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -82,9 +77,11 @@ public class SecurityConfig {
     public class CustomSecurityFilterManger extends AbstractHttpConfigurer<CustomSecurityFilterManger, HttpSecurity> {
         @Override
         public void configure(HttpSecurity builder) throws Exception {
-            AuthenticationManager authenticationManager = builder.getSharedObject(AuthenticationManager.class);
-            builder.addFilter(new JwtAuthenticationFilter(authenticationManager, jwtService));
-            builder.addFilter(new JwtAuthorizationFilter(authenticationManager, jwtService));
+//            AuthenticationManager authenticationManager = builder.getSharedObject(AuthenticationManager.class);
+            builder.addFilter(jwtAuthenticationFilter);
+            builder.addFilter(jwtAuthorizationFilter);
+//            builder.addFilter(new JwtAuthenticationFilter(authenticationManager, jwtService));
+//            builder.addFilter(new JwtAuthorizationFilter(authenticationManager, jwtService));
             super.configure(builder);
         }
     }
