@@ -14,8 +14,6 @@ import shop.guCoding.shopping.config.auth.LoginUser;
 import shop.guCoding.shopping.domain.user.User;
 import shop.guCoding.shopping.domain.user.UserEnum;
 import shop.guCoding.shopping.domain.user.UserRepository;
-import shop.guCoding.shopping.handler.ex.CustomJwtException;
-
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Calendar;
@@ -61,7 +59,7 @@ public class JwtService {
 
         String jwtToken = JWT.create()
                 .withSubject("shopping")
-                .withExpiresAt(new Date(System.currentTimeMillis() + 1000 * 60 * 24 * 7 )) // 1주일 // 오류낼려고 잠시 수정
+                .withExpiresAt(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24 * 7 )) // 1주일
                 .withClaim("id", loginUser.getUser().getId())
                 .withClaim("role", loginUser.getUser().getRole().name())
                 .sign(Algorithm.HMAC512(SECRET));
@@ -73,7 +71,29 @@ public class JwtService {
     public String refreshTokenCreate() {
         String jwtToken = JWT.create()
                 .withSubject("shopping")
-                .withExpiresAt(new Date(System.currentTimeMillis() + EXPIRATION_TIME * 4 )) // integer 도 잘되나 확인
+                .withExpiresAt(new Date(System.currentTimeMillis() + EXPIRATION_TIME * 4 ))
+                .sign(Algorithm.HMAC512(SECRET));
+
+        return TOKEN_PREFIX + jwtToken;
+    }
+
+    // 유효기간 얼마안남은 테스트용
+
+    public String testAccessTokenCreate(LoginUser loginUser) {
+
+        String jwtToken = JWT.create()
+                .withSubject("shopping")
+                .withExpiresAt(new Date(System.currentTimeMillis() + 100)) // 0초로 하니 버그난건가?
+                .withClaim("id", loginUser.getUser().getId())
+                .withClaim("role", loginUser.getUser().getRole().name())
+                .sign(Algorithm.HMAC512(SECRET));
+
+        return TOKEN_PREFIX + jwtToken;
+    }
+    public String testRefreshTokenCreate() {
+        String jwtToken = JWT.create()
+                .withSubject("shopping")
+                .withExpiresAt(new Date(System.currentTimeMillis() + EXPIRATION_TIME - 100)) // 1주일 이내
                 .sign(Algorithm.HMAC512(SECRET));
 
         return TOKEN_PREFIX + jwtToken;
@@ -81,7 +101,7 @@ public class JwtService {
 
     // header 검증
     public boolean checkHeaderVerify(HttpServletRequest request) {
-        log.debug("디버그 : access token 헤더 있니?" + ACCESS_HEADER);
+//        log.debug("디버그 : access token 헤더 있니?" + ACCESS_HEADER);
         String accessHeader = request.getHeader(ACCESS_HEADER);
         String refreshHeader = request.getHeader(REFRESH_HEADER);
 
@@ -101,12 +121,12 @@ public class JwtService {
 
     // accessToken 검증 및 세션생성
     public LoginUser accessTokenVerify(String token) {
-        log.debug("accessToken 검증할게요");
+        log.debug("accessToken 검증할게요 " + token);
         DecodedJWT decodedJWT = JWT.require(Algorithm.HMAC512(SECRET)).build().verify(token);
 
         Long id = decodedJWT.getClaim("id").asLong();
         String role = decodedJWT.getClaim("role").asString();
-        log.debug("토큰의 유저의 role" + role);
+//        log.debug("토큰의 유저의 role " + role);
         User user = User.builder().id(id).role(UserEnum.valueOf(role)).build();
         LoginUser loginUser = new LoginUser(user);
         return loginUser;
@@ -115,7 +135,9 @@ public class JwtService {
 
     // refreshToken 검증
     public void refreshTokenVerify(String token) {
+        log.debug("token " + token);
         JWT.require(Algorithm.HMAC512(SECRET)).build().verify(token);
+
     }
 
 
@@ -123,6 +145,7 @@ public class JwtService {
    public boolean reissueRefreshToken(String token) {
        try {
            Date expiresAt = JWT.require(Algorithm.HMAC512(SECRET)).build().verify(token).getExpiresAt();
+           log.debug("만료일 " + expiresAt);
            Date current = new Date(System.currentTimeMillis());
            Calendar calendar = Calendar.getInstance(); // Calendar 가 추가되면서 대부분의 Date 의 메서드가 deprecated
            calendar.setTime(current);

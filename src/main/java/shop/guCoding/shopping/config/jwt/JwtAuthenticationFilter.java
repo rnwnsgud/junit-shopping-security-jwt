@@ -32,6 +32,16 @@ import static shop.guCoding.shopping.dto.user.UserRespDto.*;
 @Component
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
+    private final AuthenticationManager authenticationManager;
+    private final JwtService jwtService;
+
+
+    public JwtAuthenticationFilter(AuthenticationManager authenticationManager, JwtService jwtService) {
+        super(authenticationManager);
+        setFilterProcessesUrl("/api/login");
+        this.authenticationManager = authenticationManager;
+        this.jwtService = jwtService;
+    }
 
     private final Logger log = LoggerFactory.getLogger(getClass());
 
@@ -44,15 +54,6 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     @Value("${jwt.token_prefix:null}")
     private String TOKEN_PREFIX;
 
-    private final AuthenticationManager authenticationManager;
-    private final JwtService jwtService;
-
-    public JwtAuthenticationFilter(AuthenticationManager authenticationManager, JwtService jwtService) {
-        super(authenticationManager);
-        setFilterProcessesUrl("/api/login");
-        this.authenticationManager = authenticationManager;
-        this.jwtService = jwtService;
-    }
 
     // Post : /login
     @Override
@@ -83,7 +84,10 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         LoginUser loginUser = (LoginUser) authResult.getPrincipal();
 
         String jwtAccessToken = jwtService.accessTokenCreate(loginUser);
-        String jwtRefreshToken = jwtService.refreshTokenCreate();
+//        String jwtAccessToken = jwtService.testAccessTokenCreate(loginUser);
+        String jwtRefreshToken = jwtService.refreshTokenCreate(); // 다시 돌리기
+//        String jwtRefreshToken = jwtService.testRefreshTokenCreate();
+
 //
 //        log.debug("디버그 : jwtAccTK " + jwtAccessToken);
 //        log.debug("디버그 : jwtRefTK " + jwtRefreshToken);

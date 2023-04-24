@@ -37,7 +37,7 @@ logging:
 
 jwt:
   secret : "구코딩" # 서버만 알고있는 시크릿 키
-  expiration_time : 10080000 # 1000 * 60 * 24 * 7 1주일 시간
+  expiration_time : 604800000 # 1000 * 60 * 60 * 24 * 7 1주일 시간
   token_prefix : "Bearer "
   access_header : "ACCESS_TOKEN"
   refresh_header : "REFRESH_TOKEN"

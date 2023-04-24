@@ -20,6 +20,7 @@ public class AuthenticationMangerConfig {
     // PasswordEncoder 의존하고 있음
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+        log.debug("디버그 : authenticationManager 등록");
         return authenticationConfiguration.getAuthenticationManager();
     }
 }

@@ -1,5 +1,7 @@
 package shop.guCoding.shopping.config.jwt;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +21,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Date;
 
 @Component
 public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
@@ -31,6 +34,9 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
     @Value("${jwt.refresh_header:null}")
     private String REFRESH_HEADER;
 
+    @Value("${jwt.secret}")
+    private String SECRET;
+
     private final JwtService jwtService;
 
 
@@ -41,8 +47,8 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
-        log.debug("디버그 : 인가필터 호출");
-        log.debug("@value 찍힘? " + ACCESS_HEADER);
+//        log.debug("디버그 : 인가필터 호출");
+//        log.debug("@value 찍힘? " + ACCESS_HEADER);
         // header 검증
         // if로 안 묶으면 회원가입시 token 이 null 이라 오류뜸, 테스트마다 access(실제값), refresh 넣어줘야하네()
         if (jwtService.checkHeaderVerify(request)) {
@@ -60,22 +66,23 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
             } catch (TokenExpiredException e) {
                 log.error("accessToken 오류");
                 // refreshToken 검증
-                try {
-                    jwtService.refreshTokenVerify(refreshToken);
-                    LoginUser loginUser = jwtService.findUserWithRefreshToken(refreshToken);
-                    String reissuedAccessToken = jwtService.accessTokenCreate(loginUser);
-                    response.addHeader(ACCESS_HEADER, reissuedAccessToken);
-                } catch (TokenExpiredException exception) {
-                    throw new CustomJwtException(exception.getMessage());
-                }
+                jwtService.refreshTokenVerify(refreshToken);
+                LoginUser loginUser = jwtService.findUserWithRefreshToken(refreshToken);
+                String reissuedAccessToken = jwtService.accessTokenCreate(loginUser);
+                log.debug("재발급 accessToken " + reissuedAccessToken);
+
+                Date expiresAt = JWT.require(Algorithm.HMAC512(SECRET)).build().verify(reissuedAccessToken).getExpiresAt();
+                log.debug("재발급 accessToken 만료일 " + expiresAt);
+
+                response.setHeader(ACCESS_HEADER, reissuedAccessToken);
 
             }
-
 
             // refreshToken 이 7일 이내 만료 될 경우 refreshToken 재발급
             if (jwtService.reissueRefreshToken(refreshToken)) {
                 refreshToken = jwtService.refreshTokenCreate();
-                response.addHeader(REFRESH_HEADER, refreshToken);
+                response.setHeader(REFRESH_HEADER, refreshToken);
+
             }
         }
 
