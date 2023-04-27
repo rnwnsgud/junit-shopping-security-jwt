@@ -16,9 +16,7 @@ import shop.guCoding.shopping.domain.user.UserEnum;
 import shop.guCoding.shopping.domain.user.UserRepository;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Optional;
+import java.util.*;
 
 
 @Slf4j
@@ -69,9 +67,10 @@ public class JwtService {
 
     // refreshToken 생성
     public String refreshTokenCreate() {
+        Date expirationDate = new Date(System.currentTimeMillis() + 1000L * 60 * 60 * 24 * 7 * 4); // 4주일
         String jwtToken = JWT.create()
                 .withSubject("shopping")
-                .withExpiresAt(new Date(System.currentTimeMillis() + EXPIRATION_TIME * 4 ))
+                .withExpiresAt(expirationDate)
                 .sign(Algorithm.HMAC512(SECRET));
 
         return TOKEN_PREFIX + jwtToken;
@@ -83,7 +82,7 @@ public class JwtService {
 
         String jwtToken = JWT.create()
                 .withSubject("shopping")
-                .withExpiresAt(new Date(System.currentTimeMillis() + 100)) // 0초로 하니 버그난건가?
+                .withExpiresAt(new Date(System.currentTimeMillis() + 100))
                 .withClaim("id", loginUser.getUser().getId())
                 .withClaim("role", loginUser.getUser().getRole().name())
                 .sign(Algorithm.HMAC512(SECRET));
@@ -136,7 +135,9 @@ public class JwtService {
     // refreshToken 검증
     public void refreshTokenVerify(String token) {
         log.debug("token " + token);
-        JWT.require(Algorithm.HMAC512(SECRET)).build().verify(token);
+
+        DecodedJWT decodedJWT = JWT.require(Algorithm.HMAC512(SECRET)).build().verify(token);
+        log.debug("decodedJWT" + decodedJWT);
 
     }
 

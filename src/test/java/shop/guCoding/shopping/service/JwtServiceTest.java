@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import shop.guCoding.shopping.config.auth.LoginUser;
 import shop.guCoding.shopping.domain.user.User;
 import shop.guCoding.shopping.domain.user.UserEnum;
@@ -20,8 +21,12 @@ class JwtServiceTest {
     private JwtService jwtService;
 
 
+
     @Value("${jwt.token_prefix:null}")
     private String TOKEN_PREFIX;
+
+    @Value("${jwt.secret}")
+    private String SECRET;
 
     private String createAccessToken() {
         User user = User.builder().id(1L).role(UserEnum.CUSTOMER).build();
@@ -32,6 +37,7 @@ class JwtServiceTest {
     }
 
     private String createRefreshToken() {
+
         String refreshToken = jwtService.refreshTokenCreate();
         return refreshToken;
     }

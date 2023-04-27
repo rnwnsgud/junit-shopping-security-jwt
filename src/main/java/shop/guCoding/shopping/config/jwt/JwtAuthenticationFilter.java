@@ -10,11 +10,10 @@ import org.springframework.security.authentication.InternalAuthenticationService
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.stereotype.Component;
 import shop.guCoding.shopping.config.auth.LoginUser;
-import shop.guCoding.shopping.dto.user.UserReqDto;
-import shop.guCoding.shopping.dto.user.UserRespDto;
 import shop.guCoding.shopping.service.JwtService;
 import shop.guCoding.shopping.util.CustomResponseUtil;
 
@@ -36,6 +35,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     private final JwtService jwtService;
 
 
+
     public JwtAuthenticationFilter(AuthenticationManager authenticationManager, JwtService jwtService) {
         super(authenticationManager);
         setFilterProcessesUrl("/api/login");
@@ -53,6 +53,9 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
     @Value("${jwt.token_prefix:null}")
     private String TOKEN_PREFIX;
+
+    @Value("${jwt.secret}")
+    private String SECRET;
 
 
     // Post : /login
@@ -82,6 +85,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         log.debug("디버그 : successfulAuthentication 호출됨");
 
         LoginUser loginUser = (LoginUser) authResult.getPrincipal();
+
 
         String jwtAccessToken = jwtService.accessTokenCreate(loginUser);
 //        String jwtAccessToken = jwtService.testAccessTokenCreate(loginUser);
