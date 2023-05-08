@@ -35,7 +35,7 @@ public class User {
     private String email;
 
     @Column(nullable = false, length = 20)
-    private String fullname;
+    private String fullName;
 
     @Column(length = 250)
     private String refreshToken;
@@ -63,13 +63,14 @@ public class User {
     }
 
     @Builder
-    public User(Long id, String username, String password, String email, String fullname, UserEnum role, List<Account> accountList, List<Order> orderList, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public User(Long id, String username, String password, String email, String fullName, UserEnum role, String refreshToken, List<Account> accountList, List<Order> orderList, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.username = username;
         this.password = password;
         this.email = email;
-        this.fullname = fullname;
+        this.fullName = fullName;
         this.role = role;
+        this.refreshToken = refreshToken;
         this.accountList = accountList;
         this.orderList = orderList;
         this.createdAt = createdAt;

@@ -7,6 +7,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import shop.guCoding.shopping.domain.user.User;
+import shop.guCoding.shopping.handler.ex.CustomApiException;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -46,6 +47,33 @@ public class Account {
     @Column(nullable = false)
     private LocalDateTime updatedAt;
 
+    public void checkOwner(Long userId) {
+        if (user.getId().longValue() != userId.longValue()) {
+            throw new CustomApiException("계좌 소유자 아닙니다."); // user_id는 컬럼에 있으므로 lazy로딩이 일어나지 않음, long값 비교주의
+
+        }
+    }
+
+    public void deposit(Long amount) {
+        balance = balance + amount;
+    }
+
+    public void checkSamePassword(Long password) {
+        if (this.password.longValue() != password.longValue()) {
+            throw new CustomApiException("계좌 비밀번호 검증에 실패했습니다.");
+        }
+    }
+
+    public void checkBalance(Long amount) {
+        if (this.balance < amount) {
+            throw new CustomApiException("계좌 잔액이 부족합니다.");
+        }
+    }
+
+    public void withdraw(Long amount) {
+        checkBalance(amount);
+        balance = balance - amount;
+    }
     @Builder
     public Account(Long id, Long number, Long password, Long balance, User user, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;

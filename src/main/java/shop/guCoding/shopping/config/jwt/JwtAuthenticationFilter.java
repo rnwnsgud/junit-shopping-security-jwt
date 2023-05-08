@@ -45,17 +45,17 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
     private final Logger log = LoggerFactory.getLogger(getClass());
 
-    @Value("${jwt.access_header:null}")
-    private String ACCESS_HEADER;
-
-    @Value("${jwt.refresh_header:null}")
-    private String REFRESH_HEADER;
-
-    @Value("${jwt.token_prefix:null}")
-    private String TOKEN_PREFIX;
-
-    @Value("${jwt.secret}")
-    private String SECRET;
+//    @Value("${jwt.access_header:null}")
+//    private String ACCESS_HEADER;
+//
+//    @Value("${jwt.refresh_header:null}")
+//    private String REFRESH_HEADER;
+//
+//    @Value("${jwt.token_prefix:null}")
+//    private String TOKEN_PREFIX;
+//
+//    @Value("${jwt.secret}")
+//    private String SECRET;
 
 
     // Post : /login
@@ -96,11 +96,11 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 //        log.debug("디버그 : jwtAccTK " + jwtAccessToken);
 //        log.debug("디버그 : jwtRefTK " + jwtRefreshToken);
 
-        response.addHeader(ACCESS_HEADER, jwtAccessToken);
-        response.addHeader(REFRESH_HEADER, jwtRefreshToken);
+        response.addHeader("ACCESS_TOKEN", jwtAccessToken);
+        response.addHeader("REFRESH_TOKEN", jwtRefreshToken);
 
 //        log.debug("TOKEN_PREFIX " + token_prefix);
-        String refreshTokenNotBearer = jwtRefreshToken.replace(TOKEN_PREFIX,"");
+        String refreshTokenNotBearer = jwtRefreshToken.replace("Bearer ","");
         log.debug("디버그 : refreshTokenNotBearer " + refreshTokenNotBearer);
 
         jwtService.saveRefreshToken(loginUser,refreshTokenNotBearer);

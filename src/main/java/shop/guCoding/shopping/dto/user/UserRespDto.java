@@ -17,7 +17,7 @@ public class UserRespDto {
         public JoinRespDto(User user) {
             this.id = user.getId();
             this.username = user.getUsername();
-            this.fullname = user.getFullname();
+            this.fullname = user.getFullName();
         }
     }
 

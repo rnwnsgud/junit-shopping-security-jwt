@@ -44,7 +44,7 @@ public class UserReqDto {
                     .username(username)
                     .password(bcryptPasswordEncoder.encode(password))
                     .email(email)
-                    .fullname(fullname)
+                    .fullName(fullname)
                     .role(UserEnum.CUSTOMER)
                     .build();
         }

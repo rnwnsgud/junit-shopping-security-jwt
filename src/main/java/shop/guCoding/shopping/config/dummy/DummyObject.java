@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 
 public class DummyObject {
 
-    protected User newUser(String username, String fullname) {
+    protected User newUser(String username, String fullname, String refreshToken) {
 
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         String encPassword = passwordEncoder.encode("1234");
@@ -17,8 +17,9 @@ public class DummyObject {
                 .username(username)
                 .password(encPassword)
                 .email(username + "@nate.com")
-                .fullname(fullname)
+                .fullName(fullname)
                 .role(UserEnum.CUSTOMER)
+                .refreshToken(refreshToken)
                 .build();
     }
 
@@ -32,7 +33,7 @@ public class DummyObject {
                 .username(username)
                 .password(encPassword)
                 .email(username + "@nate.com")
-                .fullname(fullname)
+                .fullName(fullname)
                 .role(UserEnum.CUSTOMER)
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())

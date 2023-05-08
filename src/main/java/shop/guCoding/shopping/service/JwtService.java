@@ -120,7 +120,7 @@ public class JwtService {
 
     // accessToken 검증 및 세션생성
     public LoginUser accessTokenVerify(String token) {
-        log.debug("accessToken 검증할게요 " + token);
+//        log.debug("accessToken 검증할게요 " + token);
         DecodedJWT decodedJWT = JWT.require(Algorithm.HMAC512(SECRET)).build().verify(token);
 
         Long id = decodedJWT.getClaim("id").asLong();
@@ -134,11 +134,7 @@ public class JwtService {
 
     // refreshToken 검증
     public void refreshTokenVerify(String token) {
-        log.debug("token " + token);
-
-        DecodedJWT decodedJWT = JWT.require(Algorithm.HMAC512(SECRET)).build().verify(token);
-        log.debug("decodedJWT" + decodedJWT);
-
+       JWT.require(Algorithm.HMAC512(SECRET)).build().verify(token);
     }
 
 
@@ -146,7 +142,7 @@ public class JwtService {
    public boolean reissueRefreshToken(String token) {
        try {
            Date expiresAt = JWT.require(Algorithm.HMAC512(SECRET)).build().verify(token).getExpiresAt();
-           log.debug("만료일 " + expiresAt);
+//           log.debug("만료일 " + expiresAt);
            Date current = new Date(System.currentTimeMillis());
            Calendar calendar = Calendar.getInstance(); // Calendar 가 추가되면서 대부분의 Date 의 메서드가 deprecated
            calendar.setTime(current);

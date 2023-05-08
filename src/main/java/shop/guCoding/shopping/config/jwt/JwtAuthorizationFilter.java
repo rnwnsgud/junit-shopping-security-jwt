@@ -28,19 +28,16 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 
     private final Logger log = LoggerFactory.getLogger(getClass());
 
-    @Value("${jwt.access_header:null}")
-    private String ACCESS_HEADER;
-
-    @Value("${jwt.refresh_header:null}")
-    private String REFRESH_HEADER;
-
-    @Value("${jwt.secret}")
-    private String SECRET;
+//    @Value("${jwt.access_header:null}")
+//    private String ACCESS_HEADER;
+//
+//    @Value("${jwt.refresh_header:null}")
+//    private String REFRESH_HEADER;
+//
+//    @Value("${jwt.secret}")
+//    private String SECRET;
 
     private final JwtService jwtService;
-
-
-
 
     public JwtAuthorizationFilter(AuthenticationManager authenticationManager, JwtService jwtService) {
         super(authenticationManager);
@@ -54,15 +51,15 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 //            log.debug("principal" + request.getUserPrincipal().getName()); null
 
 
-            String accessToken = request.getHeader(ACCESS_HEADER).replace("Bearer ",""); // Bearer 앞에 없앤 순수한 토큰
-            String refreshToken = request.getHeader(REFRESH_HEADER).replace("Bearer ","");
+            String accessToken = request.getHeader("ACCESS_TOKEN").replace("Bearer ",""); // Bearer 앞에 없앤 순수한 토큰
+            String refreshToken = request.getHeader("REFRESH_TOKEN").replace("Bearer ","");
 
             // accessToken 검증
             try {
                 LoginUser loginUser = jwtService.accessTokenVerify(accessToken);
                 Authentication authentication = new UsernamePasswordAuthenticationToken(loginUser,null,loginUser.getAuthorities());
                 SecurityContextHolder.getContext().setAuthentication(authentication);
-//                jwtService.refreshTokenVerify(refreshToken); // 이 메서드 자체가 이상 -> accessToken을 넣으니 괜찮음 -> refreshToken을 만들때 이상해짐 -> 유효기간이 3~4주가 최대였음..
+//                jwtService.refreshTokenVerify(refreshToken); // int 최대 범위 오류
 
 //                log.debug("securityContext" + SecurityContextHolder.getContext().getAuthentication().getPrincipal());
             } catch (TokenExpiredException e) {
@@ -73,7 +70,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
                 LoginUser loginUser = jwtService.findUserWithRefreshToken(refreshToken);
                 String reissuedAccessToken = jwtService.accessTokenCreate(loginUser);
                 log.debug("재발급 accessToken " + reissuedAccessToken);
-                response.setHeader(ACCESS_HEADER, reissuedAccessToken);
+                response.setHeader("ACCESS_TOKEN", reissuedAccessToken);
 
             }
 
@@ -81,7 +78,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
             if (jwtService.reissueRefreshToken(refreshToken)) {
 
                 refreshToken = jwtService.refreshTokenCreate();
-                response.setHeader(REFRESH_HEADER, refreshToken);
+                response.setHeader("REFRESH_TOKEN", refreshToken);
 
             }
         }

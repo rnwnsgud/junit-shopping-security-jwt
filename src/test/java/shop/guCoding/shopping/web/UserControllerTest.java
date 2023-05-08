@@ -31,7 +31,7 @@ class UserControllerTest extends DummyObject {
 
     @BeforeEach
     public void setUp() {
-        userRepository.save(newUser("ssar", "쌀"));
+        userRepository.save(newUser("ssar", "쌀", null));
         em.clear();
     }
 
